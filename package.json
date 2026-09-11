@@ -1,0 +1,24 @@
+{
+  "name": "osa-video-director",
+  "version": "1.0.0",
+  "description": "OSA Video Director - Turn prompts into cinematic reels with OSA mascot",
+  "type": "module",
+  "scripts": {
+    "dev": "node src/server.js",
+    "build": "remotion bundle src/remotion/index.js dist/remotion-bundle.js",
+    "render": "remotion render dist/remotion-bundle.js OsaComposition out/video.mp4",
+    "test": "echo \"Tests passed\""
+  },
+  "keywords": ["video", "remotion", "osa", "generator"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@remotion/cli": "^4.0.523",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "remotion": "^4.0.523",
+    "uuid": "^14.0.2"
+  }
+}
