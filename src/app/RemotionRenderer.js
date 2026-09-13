@@ -11,7 +11,7 @@ const execAsync = promisify(exec);
 
 export class RemotionRenderer {
   constructor(options = {}) {
-    this.bundlePath = options.bundlePath || './dist/remotion-bundle.js';
+    this.bundlePath = options.bundlePath || './src/remotion/index.js';
     this.outputDir = options.outputDir || './outputs';
     this.compositionId = options.compositionId || 'OsaComposition';
   }
@@ -54,7 +54,7 @@ export class RemotionRenderer {
         --width=${dimensions.width} \
         --height=${dimensions.height} \
         --fps=${fps} \
-        --frames=${totalFrames} \
+        --frames=0-${totalFrames - 1} \
         --codec=h264 \
         --crf=23
     `.trim().replace(/\s+/g, ' ');
@@ -81,10 +81,7 @@ export class RemotionRenderer {
       };
     } catch (error) {
       console.error('Remotion render failed:', error.message);
-      
-      // If remotion fails, create a placeholder video using ffmpeg
-      console.log('Falling back to FFmpeg placeholder generation...');
-      return this.createPlaceholderVideo(outputPath, dimensions, fps, totalFrames);
+      throw new Error(`REAL_REMOTION_RENDER_FAILED: ${error.message}`);
     }
   }
 

@@ -66,8 +66,15 @@ export const OsaComposition = ({
       ) : (
         // Render scenes from the job
         scenes.map((scene, index) => (
-          <Sequence 
-            key={scene.id || index} 
+          <Sequence
+            key={scene.id || index}
+            from={scenes
+              .slice(0, index)
+              .reduce(
+                (total, previousScene) =>
+                  total + (previousScene.durationInFrames || fps * 10),
+                0
+              )}
             durationInFrames={scene.durationInFrames || (fps * 10)}
             layout="none"
           >

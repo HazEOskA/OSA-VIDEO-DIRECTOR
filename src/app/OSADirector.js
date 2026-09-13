@@ -163,12 +163,11 @@ export class OSADirector {
     const durationMatch = prompt.match(/(\d+)\s*-?\s*(second|sec|s)/i);
     const durationTarget = durationMatch ? parseInt(durationMatch[1]) : job.durationTarget;
     
-    // Create scene structure based on Truman Show AI demo
     const scenes = this.createDemoScenes(job.prompt, format);
     
     return {
-      title: 'Truman Show AI',
-      mainMessage: 'Persistent artificial civilization with deterministic history',
+      title: job.prompt.slice(0, 80),
+      mainMessage: job.prompt,
       hook: 'Claim is not proof. Proof must be replayable.',
       narrator: {
         style: 'cinematic documentary',
@@ -185,72 +184,47 @@ export class OSADirector {
   }
 
   createDemoScenes(prompt, format) {
-    // Create 6 scenes for the Truman Show AI demo
-    // Following OSA Character Bible and motion language
-    
-    const baseScene = {
-      backgroundColor: '#0a0a0f',
-      colors: {
-        primary: '#0a0a0f',
-        secondary: '#1a1a2e'
-      }
-    };
+    const clean = String(prompt || '')
+      .replace(/\s+/g, ' ')
+      .trim();
 
-    return [
-      {
-        id: 'scene-1',
-        title: 'TRUMAN SHOW AI',
-        description: 'Persistent Artificial Civilization',
-        durationInFrames: 150, // 5 seconds at 30fps
-        captions: 'Truman Show AI',
-        ...baseScene
-      },
-      {
-        id: 'scene-2',
-        title: '50,000 RESIDENTS',
-        description: 'Subjective agents with memory and identity',
+    const sentences = clean
+      .split(/(?<=[.!?])\s+/)
+      .map(s => s.trim())
+      .filter(Boolean);
+
+    const chunks = sentences.length
+      ? sentences.slice(0, 6)
+      : ['Untitled video request'];
+
+    while (chunks.length < 6) {
+      chunks.push(chunks[chunks.length - 1]);
+    }
+
+    return chunks.slice(0, 6).map((text, index) => {
+      const words = text
+        .replace(/[^\w\s-]/g, '')
+        .split(/\s+/)
+        .filter(Boolean);
+
+      const title = words
+        .slice(0, 5)
+        .join(' ')
+        .toUpperCase() || `SCENE ${index + 1}`;
+
+      return {
+        id: `scene-${index + 1}`,
+        title,
+        description: text,
         durationInFrames: 150,
-        captions: '~50,000 AI residents',
-        visualElements: ['Agent networks', 'Memory systems'],
-        ...baseScene
-      },
-      {
-        id: 'scene-3',
-        title: 'COMPANIES & MARKETS',
-        description: 'Autonomous economic systems',
-        durationInFrames: 150,
-        captions: 'Self-sustaining economy',
-        visualElements: ['Market dynamics', 'Institutions'],
-        ...baseScene
-      },
-      {
-        id: 'scene-4',
-        title: 'DETERMINISTIC HISTORY',
-        description: 'Every action recorded and replayable',
-        durationInFrames: 150,
-        captions: 'Deterministic timeline',
-        visualElements: ['Event logs', 'State tracking'],
-        ...baseScene
-      },
-      {
-        id: 'scene-5',
-        title: 'REPLAY CAPABILITY',
-        description: 'Full state reconstruction at any point',
-        durationInFrames: 150,
-        captions: 'Replay any moment',
-        visualElements: ['Time navigation', 'State restore'],
-        ...baseScene
-      },
-      {
-        id: 'scene-6',
-        title: 'CLAIM ≠ PROOF',
-        description: 'Proof must be replayable',
-        durationInFrames: 150,
-        captions: 'Claim is not proof. Proof must be replayable.',
-        visualElements: ['Verification seal'],
-        ...baseScene
-      }
-    ];
+        captions: text,
+        backgroundColor: '#0a0a0f',
+        colors: {
+          primary: '#0a0a0f',
+          secondary: '#1a1a2e'
+        }
+      };
+    });
   }
 
   /**
