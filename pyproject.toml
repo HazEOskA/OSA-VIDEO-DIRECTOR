@@ -1,0 +1,10 @@
+[project]
+name = "osa-video-director-runtime"
+version = "1.0.0"
+description = "Agentic post-production runtime contracts for OSA Video Director"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+pythonpath = ["runtime"]
+testpaths = ["tests"]
+addopts = "-q"

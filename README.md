@@ -103,3 +103,26 @@ styl: OSA Cyberpunk Dark
 **v0 — character/system bootstrap.**
 
 Następne etapy mogą dodać adaptery pod konkretne generatory wideo, referencyjne obrazy Osy, testy kontraktów promptów i automatyczny stitching.
+
+---
+
+## Agentic Post-Production Runtime V1
+
+Branch `feat/agentic-post-production-runtime-v1` dodaje warstwę postprodukcji bez usuwania istniejącego workflow v0.
+
+```text
+UNDERSTAND → DIRECT → EDIT → VERIFY → REPAIR → EXPORT
+```
+
+V1 dodaje:
+
+- `DirectorRuntime` — maszynowy plan montażu;
+- `DirectorDNA` — trwały kontrakt stylu montażowego;
+- adapter contracts dla DaVinci Resolve, Higgsfield i Remotion;
+- `TimelineVerifier` — kontrolę ciszy, powtórek, synchronizacji, caption gaps i brandingu;
+- `RepairPlanner` — plan poprawek wyłącznie na podstawie evidence z verifiera;
+- testy kontraktów runtime.
+
+Adaptery V1 tłumaczą decyzje na komendy, ale nie wykonują jeszcze live MCP/API/GUI control. Warstwa wykonawcza jest następnym, osobnym scope.
+
+Dokumentacja: `docs/ARCHITECTURE_V1.md` oraz `docs/ADR-001-agentic-post-production-runtime.md`.
