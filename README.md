@@ -118,11 +118,12 @@ V1 dodaje:
 
 - `DirectorRuntime` — maszynowy plan montażu;
 - `DirectorDNA` — trwały kontrakt stylu montażowego;
-- adapter contracts dla DaVinci Resolve, Higgsfield i Remotion;
+- adapter contracts dla DaVinci Resolve, Higgsfield, Remotion i FFmpeg;
+- `ExecutionRouter` — deterministyczny routing `EditAction -> AdapterCommand`;
 - `TimelineVerifier` — kontrolę ciszy, powtórek, synchronizacji, caption gaps i brandingu;
 - `RepairPlanner` — plan poprawek wyłącznie na podstawie evidence z verifiera;
 - testy kontraktów runtime.
 
 Adaptery V1 tłumaczą decyzje na komendy, ale nie wykonują jeszcze live MCP/API/GUI control. Warstwa wykonawcza jest następnym, osobnym scope.
 
-Dokumentacja: `docs/ARCHITECTURE_V1.md` oraz `docs/ADR-001-agentic-post-production-runtime.md`.
+Dokumentacja: `docs/ARCHITECTURE_V1.md`, `docs/ADR-001-agentic-post-production-runtime.md` oraz `docs/FFMPEG_INTEGRATION.md`.
