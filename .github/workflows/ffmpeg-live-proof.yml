@@ -1,0 +1,90 @@
+name: FFmpeg Live Proof
+
+on:
+  push:
+    branches:
+      - feat/agentic-post-production-runtime-v1
+    paths:
+      - "runtime/**"
+      - "tests/**"
+      - "pyproject.toml"
+      - ".github/workflows/ffmpeg-live-proof.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install runtime dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          python -m pip install --upgrade pip
+          python -m pip install pytest
+
+      - name: Install pinned ffmpeg-skill
+        shell: bash
+        run: |
+          ROOT="$RUNNER_TEMP/ffmpeg-skill-node"
+          npm install --prefix "$ROOT" --no-package-lock --no-save ffmpeg-skill@1.25.0
+          SKILL_ROOT="$ROOT/node_modules/ffmpeg-skill"
+          test -f "$SKILL_ROOT/mcp/server.py"
+          echo "FFMPEG_SKILL_ROOT=$SKILL_ROOT" >> "$GITHUB_ENV"
+
+      - name: Run full runtime tests with live MCP proof
+        env:
+          OSA_PROOF_PATH: ${{ runner.temp }}/osa-proof/ffmpeg-live-proof.json
+        run: |
+          python -m pytest -q
+
+      - name: Show proof summary
+        if: always()
+        env:
+          PROOF: ${{ runner.temp }}/osa-proof/ffmpeg-live-proof.json
+        run: |
+          if [ -f "$PROOF" ]; then
+            python - <<'PY'
+          import json, os
+          p=os.environ["PROOF"]
+          d=json.load(open(p, encoding="utf-8"))
+          print("server:", d["health"]["server_info"])
+          print("transport:", d["execution"]["transport"])
+          print("input duration:", d["input"]["probe"].get("duration"))
+          print("output duration:", d["execution"]["output"]["probe"].get("duration"))
+          print("first verify:", d["verification"]["passed"])
+          print("negative verify:", d["negative_verification"]["passed"])
+          print("repair verify:", d["repair_verification"]["passed"])
+          print("output sha256:", d["execution"]["output"]["sha256"])
+          print("repair sha256:", d["repair_execution"]["output"]["sha256"])
+          PY
+          else
+            echo "proof file missing"
+            exit 1
+          fi
+
+      - name: Upload proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ffmpeg-live-proof
+          path: ${{ runner.temp }}/osa-proof/ffmpeg-live-proof.json
+          if-no-files-found: error
+          retention-days: 14
