@@ -9,7 +9,7 @@ class RepairPlanner:
         "RETAKE_REPETITION": ("remove_retake", "davinci"),
         "SYNC_DRIFT": ("trim", "davinci"),
         "BRAND_TOKEN_MISSING": ("insert_graphic", "remotion"),
-        "CAPTION_GAP": ("caption", "remotion"),
+        "CAPTION_GAP": ("caption", "remotion"),\n        "DURATION_MISMATCH": ("trim", "ffmpeg"),
     }
 
     def from_report(self, job_id: str, report: VerificationReport) -> EditPlan:
