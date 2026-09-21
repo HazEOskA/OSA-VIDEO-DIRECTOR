@@ -1,6 +1,7 @@
-from osa_video_director import DirectorDNA, DirectorRuntime, MediaAsset, PostProductionJob, RepairPlanner, TimelineVerifier
-from osa_video_director.models import TimelineObservation
-from osa_video_director.adapters import DaVinciResolveAdapter, HiggsfieldAdapter, RemotionAdapter
+from osa_video_director import DirectorDNA, DirectorRuntime, ExecutionRouter, MediaAsset, PostProductionJob, RepairPlanner, TimelineVerifier
+from osa_video_director.models import EditAction, TimelineObservation
+from osa_video_director.adapters import DaVinciResolveAdapter, FFmpegAdapter, HiggsfieldAdapter, RemotionAdapter
+from osa_video_director.router import RoutingError
 
 
 def make_job() -> PostProductionJob:
@@ -63,3 +64,62 @@ def test_adapter_contracts_translate_without_side_effects():
         translated.append(adapter.translate(action))
     assert len(translated) == len(plan.actions)
     assert translated[0].adapter == "davinci"
+
+
+def test_ffmpeg_adapter_translates_bounded_media_action():
+    action = EditAction(
+        action_id="A900",
+        kind="export",
+        reason="Create deterministic delivery artifact.",
+        payload={"aspect_ratio": "9:16", "candidate": True},
+        preferred_adapter="ffmpeg",
+    )
+    adapter = FFmpegAdapter()
+    assert adapter.supports(action)
+    command = adapter.translate(action)
+    assert command.adapter == "ffmpeg"
+    assert command.operation == "export"
+    assert command.parameters["aspect_ratio"] == "9:16"
+    assert command.parameters["candidate"] is True
+
+
+def test_execution_router_respects_explicit_preferences():
+    commands = ExecutionRouter().route_plan(DirectorRuntime().plan(make_job()))
+    assert [command.adapter for command in commands] == [
+        "davinci",
+        "davinci",
+        "davinci",
+        "remotion",
+        "higgsfield",
+        "davinci",
+        "davinci",
+    ]
+
+
+def test_execution_router_uses_ffmpeg_as_default_for_low_level_action():
+    action = EditAction(
+        action_id="A901",
+        kind="trim",
+        reason="Bounded deterministic trim.",
+        start_s=1.0,
+        end_s=5.0,
+    )
+    command = ExecutionRouter().route(action)
+    assert command.adapter == "ffmpeg"
+    assert command.parameters["start_s"] == 1.0
+    assert command.parameters["end_s"] == 5.0
+
+
+def test_execution_router_fails_closed_for_invalid_preference():
+    action = EditAction(
+        action_id="A902",
+        kind="trim",
+        reason="Do not silently switch executors.",
+        preferred_adapter="remotion",
+    )
+    try:
+        ExecutionRouter().route(action)
+    except RoutingError as error:
+        assert "does not support trim" in str(error)
+    else:
+        raise AssertionError("RoutingError was not raised")
