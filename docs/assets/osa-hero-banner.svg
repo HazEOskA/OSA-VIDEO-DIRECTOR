@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="720" viewBox="0 0 1600 720">
+<defs><linearGradient id="b" x2="1" y2="1"><stop stop-color="#05070a"/><stop offset=".55" stop-color="#141017"/><stop offset="1" stop-color="#25040b"/></linearGradient><linearGradient id="g" x2="1"><stop stop-color="#ffd274"/><stop offset=".55" stop-color="#ef403e"/><stop offset="1" stop-color="#8c0013"/></linearGradient></defs>
+<rect width="1600" height="720" fill="url(#b)"/>
+<text x="85" y="100" font-family="Arial" font-size="72" font-weight="900" fill="#f5cc71">OSA VIDEO DIRECTOR</text>
+<text x="88" y="150" font-family="Arial" font-size="25" letter-spacing="7" fill="#fff">AI VIDEO DIRECTION SKILL</text>
+<text x="88" y="205" font-family="Arial" font-size="27" fill="#b9c1cf">Idea → director proposal → approval → scene prompts → generation → stitched story.</text>
+<g font-family="Arial" font-weight="800" text-anchor="middle">
+<rect x="90" y="315" width="230" height="110" rx="24" fill="#11151c" stroke="#b98c39"/><text x="205" y="380" font-size="28" fill="#fff">IDEA</text>
+<rect x="365" y="315" width="230" height="110" rx="24" fill="#11151c" stroke="#c99335"/><text x="480" y="365" font-size="26" fill="#fff">DIRECTOR</text><text x="480" y="397" font-size="20" fill="#d9a94b">PHASE A</text>
+<rect x="640" y="315" width="230" height="110" rx="24" fill="#11151c" stroke="#d4a13f"/><text x="755" y="365" font-size="26" fill="#fff">APPROVAL</text><text x="755" y="397" font-size="20" fill="#e5bb67">GATE</text>
+<rect x="915" y="315" width="230" height="110" rx="24" fill="#11151c" stroke="#e24942"/><text x="1030" y="365" font-size="26" fill="#fff">6 SCENES</text><text x="1030" y="397" font-size="20" fill="#f27972">PHASE B</text>
+<rect x="1190" y="315" width="230" height="110" rx="24" fill="#11151c" stroke="#ef403e"/><text x="1305" y="365" font-size="26" fill="#fff">GENERATE</text><text x="1305" y="397" font-size="20" fill="#f07b78">+ STITCH</text>
+</g>
+<path d="M320 370H365M595 370H640M870 370H915M1145 370H1190" stroke="url(#g)" stroke-width="8"/>
+<text x="85" y="560" font-family="Arial" font-size="25" fill="#c7ced8">CHARACTER LOCK · CONTINUITY · THREE BEATS PER CLIP · OPERATOR APPROVAL</text>
+<text x="85" y="645" font-family="Arial" font-weight="700" font-size="25" fill="#e04a42">TURN IDEAS INTO CONSISTENT SCENES — NOT SIX RANDOM PROMPTS</text>
+</svg>
