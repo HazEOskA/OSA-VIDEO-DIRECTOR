@@ -1,0 +1,78 @@
+name: Docker Preview Proof
+
+on:
+  push:
+    branches:
+      - feat/docker-agent-workspace-preview
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  docker-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build preview image
+        run: docker build -t osa-video-director:preview .
+
+      - name: Start preview
+        run: |
+          docker run -d --name osa-video-director-preview -p 8080:8080 osa-video-director:preview
+
+      - name: Wait for agent workspace health
+        run: |
+          for i in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8080/api/runtime/health | tee /tmp/runtime-health.json; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker logs osa-video-director-preview
+          exit 1
+
+      - name: Run real media proof inside container
+        run: |
+          docker exec             -e OSA_DOCKER_PROOF_PATH=/tmp/osa-docker-proof.json             osa-video-director-preview             python3 scripts/docker_preview_proof.py
+          docker cp osa-video-director-preview:/tmp/osa-docker-proof.json /tmp/osa-docker-proof.json
+
+      - name: Verify preview HTTP
+        run: |
+          curl --fail --silent http://127.0.0.1:8080/ > /tmp/preview.html
+          grep -q "OSA VIDEO DIRECTOR" /tmp/preview.html
+
+      - name: Show proof summary
+        run: |
+          python3 - <<'PY'
+          import json
+          p=json.load(open("/tmp/osa-docker-proof.json", encoding="utf-8"))
+          print("status:", p["status"])
+          print("transport:", p["transport"])
+          print("upstream:", p["upstream_version"])
+          print("output duration:", p["output"]["probe"].get("duration"))
+          print("verify:", p["verification"]["passed"])
+          print("negative verify:", p["negative_verification"]["passed"])
+          print("repair verify:", p["repair_verification"]["passed"])
+          print("sha256:", p["output"]["sha256"])
+          PY
+
+      - name: Capture container logs
+        if: always()
+        run: docker logs osa-video-director-preview > /tmp/docker-preview.log 2>&1 || true
+
+      - name: Upload preview proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-agent-workspace-proof
+          path: |
+            /tmp/runtime-health.json
+            /tmp/osa-docker-proof.json
+            /tmp/docker-preview.log
+          if-no-files-found: warn
+          retention-days: 14
